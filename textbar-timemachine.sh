@@ -7,6 +7,9 @@
 ## Note:	This has been tested with 1 local Time Machine drive and 1 Time Capsule drive.
 ##			Not sure how it would work if there are multiple of either of those
 
+__filename=${${(%):-%N}:A}
+__dirname=${__filename:h}
+
 NAME="$0:t:r"
 
 if [ -e "$HOME/.path" ]
@@ -152,7 +155,7 @@ then
 		DIFF=$(($EPOCHSECONDS - $LAST_RUN_TIME))
 
 			# convert the seconds to a readable format
-		DIFF_READABLE=$(seconds2readable.sh "$DIFF")
+		DIFF_READABLE=$($__dirname/seconds2readable.sh "$DIFF")
 
 			# Here is where you set the time elapsed before you get warned with a special status line
 			#  7,200 seconds = 2 hours or 14,400 seconds = 4 hours
@@ -207,10 +210,10 @@ CURRENT_STATUS="$HOME/.$NAME.status.txt"
 
 	# Now we parse the local file for the info we want.
 BYTES=$(sed 's#^ *##g ; s#\;##g; s#"##g' "$CURRENT_STATUS" | awk -F' ' '/^bytes/{print $NF}' || echo 0)
-	SIZE_COPIED=$(bytes2readable.sh "$BYTES" | sed 's#\.[0-9][0-9] MB# MB#g')
+	SIZE_COPIED=$($__dirname/bytes2readable.sh "$BYTES" | sed 's#\.[0-9][0-9] MB# MB#g')
 
 TOTAL_BYTES=$(sed 's#^ *##g ; s#\;##g; s#"##g' "$CURRENT_STATUS" | awk -F' ' '/^totalBytes/{print $NF}' || echo 0)
-	TOTAL_TO_COPY=$(bytes2readable.sh "$TOTAL_BYTES" | sed 's#\.[0-9][0-9] MB# MB#g')
+	TOTAL_TO_COPY=$($__dirname/bytes2readable.sh "$TOTAL_BYTES" | sed 's#\.[0-9][0-9] MB# MB#g')
 
 	# now we calculate the byte info
 if [ "$TOTAL_BYTES" != "" -a "$BYTES" != "" ]
@@ -219,7 +222,7 @@ then
 	PERCENT_OF_BYTES=$(echo "scale=2 ; ($BYTES / $TOTAL_BYTES)" | bc | sed 's#\.##g ; s#$#%#g' || echo 0)
 
 	BYTES_REMAINING=$(($TOTAL_BYTES - $BYTES))
-		BYTES_REMAINING_READABLE=$(bytes2readable.sh "$BYTES_REMAINING" | sed 's#\.[0-9][0-9] MB# MB#g')
+		BYTES_REMAINING_READABLE=$($__dirname/bytes2readable.sh "$BYTES_REMAINING" | sed 's#\.[0-9][0-9] MB# MB#g')
 
 else
 
@@ -238,11 +241,11 @@ TOTAL_FILES=$(sed 's#^ *##g ; s#\;##g; s#"##g' "$CURRENT_STATUS" | awk -F' ' '/^
 	# change the number to have commas in the right places
 if [[ "$JUST_FILES" == "$TOTAL_FILES" ]]
 then
-	FILES_SO_FAR_READABLE=$(commaformat.sh "$JUST_FILES")
+	FILES_SO_FAR_READABLE=$($__dirname/commaformat.sh "$JUST_FILES")
 else
 
-	JUST_FILES_READABLE=$(commaformat.sh "$JUST_FILES")
-	TOTAL_FILES_READABLE=$(commaformat.sh "$TOTAL_FILES")
+	JUST_FILES_READABLE=$($__dirname/commaformat.sh "$JUST_FILES")
+	TOTAL_FILES_READABLE=$($__dirname/commaformat.sh "$TOTAL_FILES")
 
 	FILES_SO_FAR_READABLE="$JUST_FILES_READABLE / $TOTAL_FILES_READABLE"
 fi
@@ -281,7 +284,7 @@ then
 
 else
 		# convert the time remaining to a readable format
-	READABLE_TIME=$(seconds2readable.sh "$TIME_REMAINING")
+	READABLE_TIME=$($__dirname/seconds2readable.sh "$TIME_REMAINING")
 
 		# calculate when the completed time will be when it finishes
 		# note that this estimate is often completely wrong, so
